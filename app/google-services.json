@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "743101590443",
+    "firebase_url": "https://emnet-8428c.firebaseio.com",
+    "project_id": "emnet-8428c",
+    "storage_bucket": "emnet-8428c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743101590443:android:a3e5fc4b18ca79239940ee",
+        "android_client_info": {
+          "package_name": "com.ffc.emnet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "743101590443-52e6qmuhppu2mdeorghn0nebhj1vddf8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ffc.emnet",
+            "certificate_hash": "cdac21d948cd443c73f007a792bc691d219dcf2c"
+          }
+        },
+        {
+          "client_id": "743101590443-gb9bjss8ormecolihi52st6baoh2qgm2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWMpt5xSFUNhWqtTT2FkLYja8CEk-3rIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "743101590443-gb9bjss8ormecolihi52st6baoh2qgm2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
