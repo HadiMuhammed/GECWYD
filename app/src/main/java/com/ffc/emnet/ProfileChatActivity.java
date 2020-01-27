@@ -17,13 +17,15 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class ProfileChatActivity extends AppCompatActivity implements MessageDatabase {
+public class ProfileChatActivity extends AppCompatActivity implements MessageDatabase,Locate {
     private String username,phonenumber;
     private ListView messages;
     private Button sendbtn;
@@ -32,6 +34,8 @@ public class ProfileChatActivity extends AppCompatActivity implements MessageDat
     private List<String> UsernamesString;
     private List<String> PhonenumbersString;
     private CustomAdaptorforMessage customadaptor = new CustomAdaptorforMessage();
+    private FirebaseDatabase database;
+    private DatabaseReference inboxof;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +52,27 @@ public class ProfileChatActivity extends AppCompatActivity implements MessageDat
         messages = (ListView) findViewById(R.id.messages);
         messagestext = (EditText) findViewById(R.id.messagetext);
         sendbtn = (Button) findViewById(R.id.message_send);
-        messages.setAdapter(customadaptor);
-      LoadMessage();
+        database = FirebaseDatabase.getInstance();
+        try {
+            inboxof = database.getReference("InboxOf/" + phonenumber);
+        }catch(Exception e){
 
+        }
+        messages.setAdapter(customadaptor);
+
+      try {
+          LoadMessage();
+      }
+      catch(Exception e)
+      {
+
+      }
 
 
         sendbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MessageDatabase.inboxref.child(phonenumber).setValue(messagestext.getText().toString());
+                inboxof.setValue(Locate.CurrentUserPhoneNumber+":>  "+messagestext.getText().toString()+"   ");
                 messagestext.setText("");
 
             }
@@ -71,21 +87,21 @@ public class ProfileChatActivity extends AppCompatActivity implements MessageDat
     private void LoadMessage()
     {
 
-        MessageDatabase.inboxref.addValueEventListener(new ValueEventListener() {
+        inboxof.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-
-                    MessagesString.add(ds.getValue().toString());
-                    UsernamesString.add("Message :");
-                    PhonenumbersString.add(ds.getKey());
 
 
+                    try {
+                        MessagesString.add(dataSnapshot.getValue().toString());
+                        UsernamesString.add(": Message :");
+                        PhonenumbersString.add("_Alert_");
+                        customadaptor.notifyDataSetChanged();
+                    }
+                    catch(Exception e)
+                    {
 
-                }
-
-                customadaptor.notifyDataSetChanged();
-
+                    }
 
 
             }

@@ -29,6 +29,7 @@ public interface Locate {
      DatabaseReference Roadaccident = database.getReference("ROADACCIDENT");
      DatabaseReference Childmissing = database.getReference("CHILDMISSING");
      DatabaseReference Iamintrouble = database.getReference("IAMINTROUBLE");
+     DatabaseReference Events = database.getReference("Events");
 
 
      FirebaseAuth mAuth = FirebaseAuth.getInstance();

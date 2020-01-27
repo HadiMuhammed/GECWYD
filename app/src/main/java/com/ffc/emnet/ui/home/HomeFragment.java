@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,20 +21,29 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.ffc.emnet.EventsActivity;
 import com.ffc.emnet.HomePage;
 import com.ffc.emnet.Locate;
 import com.ffc.emnet.LocatePeopleMaps;
 import com.ffc.emnet.R;
+import com.ffc.emnet.Upload;
 import com.ffc.emnet.UserPage;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
-    private ListView HomeItems;
-    private String[] Items = {"Natural Disaster","Robbery","Road Accident","Child Missing","Show Alerts","Iam in Trouble","Delete Alerts"};
-    private int[] Images = {R.drawable.natural_disaster,R.drawable.download,R.drawable.acccident,R.drawable.child,R.drawable.locate,R.drawable.trouble,R.drawable.delete};
+    private String datapath;
+    private DatabaseReference dref;
+    private GridView HomeItems;
+    private String[] Items = {"Natural Disaster","Robbery","Road Accident","Child Missing","Iam in Trouble","Delete Alerts"};
+    private int[] Images = {R.drawable.natural_disaster,R.drawable.download,R.drawable.acccident,R.drawable.child,R.drawable.trouble,R.drawable.delete};
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -60,37 +70,32 @@ public class HomeFragment extends Fragment {
                 {
                     Message("ALert is Send");
                     Locate.Robbery.child(Locate.CurrentUserPhoneNumber).setValue("");
+                    Intent intent = new Intent(getActivity(), EventsActivity.class);
+                    startActivity(intent);
                 }
               else if(i==2)
                 {
                     Message("ALert is Send");
                     Locate.Roadaccident.child(Locate.CurrentUserPhoneNumber).setValue("");
+                    Intent intent = new Intent(getActivity(), EventsActivity.class);
+                    startActivity(intent);
                 }
               else  if(i==3)
                 {
                     Message("ALert is Send");
                     Locate.Childmissing.child(Locate.CurrentUserPhoneNumber).setValue("");
+                    Intent intent = new Intent(getActivity(), EventsActivity.class);
+                    startActivity(intent);
                 }
               else if(i==4)
                 {
-                    Message("Please wait..");
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(getActivity(), LocatePeopleMaps.class);
-                            startActivity(intent);
-                        }
-                    },0100);
+                    Message("ALert is Send");
+                    Locate.Iamintrouble.child(Locate.CurrentUserPhoneNumber).setValue("");
+                    Intent intent = new Intent(getActivity(), EventsActivity.class);
+                    startActivity(intent);
 
                 }
               else if(i==5)
-                {
-                    Message("ALert is Send");
-                    Locate.Iamintrouble.child(Locate.CurrentUserPhoneNumber).setValue("");
-
-                }
-                if(i==6)
                 {
 
                     Toast.makeText(getActivity(),"All Alerts are Deleted !",Toast.LENGTH_SHORT).show();
@@ -101,6 +106,8 @@ public class HomeFragment extends Fragment {
                     Locate.Roadaccident.child(Locate.CurrentUserPhoneNumber).removeValue();
                     Locate.Childmissing.child(Locate.CurrentUserPhoneNumber).removeValue();
                     Locate.Iamintrouble.child(Locate.CurrentUserPhoneNumber).removeValue();
+                    dref = FirebaseDatabase.getInstance().getReference("Events/"+Locate.CurrentUserPhoneNumber);
+                    dref.removeValue();
 
 
                 }

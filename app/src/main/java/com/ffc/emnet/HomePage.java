@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -18,16 +19,16 @@ import android.widget.Toast;
 import com.google.android.material.snackbar.Snackbar;
 
 public class HomePage extends AppCompatActivity implements  Locate {
-ListView listview;
-String[] Items = {"Flood","Land Slide","Earth Quake","Delete Alerts"};
-int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth,R.drawable.delete};
+GridView listview;
+String[] Items = {"Flood","Land Slide","Earth Quake"};
+int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth};
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
-    listview =  (ListView) findViewById(R.id.listview);
+    listview =  (GridView) findViewById(R.id.listview);
     CustomAdapter customAdapter = new CustomAdapter();
     listview.setAdapter(customAdapter);
 
@@ -40,26 +41,24 @@ int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth,R.drawabl
             {
                 Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
                 Locate.Floodref.child(Locate.CurrentUserPhoneNumber).setValue("");
+                Intent intent = new Intent(HomePage.this, EventsActivity.class);
+                startActivity(intent);
             }
             else if(i==1)
             {
                 Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
                 Locate.LandSlideref.child(Locate.CurrentUserPhoneNumber).setValue("");
+                Intent intent = new Intent(HomePage.this, EventsActivity.class);
+                startActivity(intent);
             }
            else if(i==2)
             {
                 Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
                 Locate.EarthQuakeref.child(Locate.CurrentUserPhoneNumber).setValue("");
+                Intent intent = new Intent(HomePage.this, EventsActivity.class);
+                startActivity(intent);
             }
-           else if(i==3)
-            {
 
-                Toast.makeText(HomePage.this,"All Alerts are Deleted !",Toast.LENGTH_SHORT).show();
-                Locate.Floodref.child(Locate.CurrentUserPhoneNumber).removeValue();
-                Locate.LandSlideref.child(Locate.CurrentUserPhoneNumber).removeValue();
-                Locate.EarthQuakeref.child(Locate.CurrentUserPhoneNumber).removeValue();
-
-            }
         }
     });
 

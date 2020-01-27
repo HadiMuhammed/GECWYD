@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
@@ -65,6 +67,21 @@ public class LocatePeopleMaps extends FragmentActivity implements OnMapReadyCall
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.map_style));
+
+
+        } catch (Resources.NotFoundException e) {
+        }
+
+
+
         mMap = googleMap;
 
 
@@ -99,14 +116,9 @@ public class LocatePeopleMaps extends FragmentActivity implements OnMapReadyCall
        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
            for(DataSnapshot ds : dataSnapshot.getChildren()){
             phonenumber = ds.getKey();
-               Handler handler = new Handler();
-               handler.postDelayed(new Runnable() {
-                   @Override
-                   public void run() {
                        Mark(phonenumber,"flood");
 
-                   }
-               },0100);
+
            }
        }
 
@@ -116,152 +128,87 @@ public class LocatePeopleMaps extends FragmentActivity implements OnMapReadyCall
        }
    });
 
-        Locate.LandSlideref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    phonenumber = ds.getKey();
 
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Mark(phonenumber,"landslide");
 
-                        }
-                    },0100);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+                final Intent intent = getIntent();
+                Handler mhandler = new Handler();
+                mhandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        phonenumber=intent.getStringExtra("Phone Number");
+                        Mark(phonenumber,"a");
+                    }
+                }, 3000);
 
 
 
+      //  Locate.LandSlideref.addValueEventListener(new ValueEventListener() {
+        //    @Override
+          //  public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            ///    for(DataSnapshot ds : dataSnapshot.getChildren()){
+               //     phonenumber = ds.getKey();
+                 //           Mark(phonenumber,"landslide");
 
 
+                //}/
+           // }
 
+            //@Override
+           // public void onCancelled(@NonNull DatabaseError databaseError) {
 
-
-        Locate.EarthQuakeref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    phonenumber = ds.getKey();
-
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Mark(phonenumber,"earthquake");
-
-                        }
-                    },0100);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        Locate.Robbery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    phonenumber = ds.getKey();
-
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Mark(phonenumber,"robbery");
-
-                        }
-                    },0100);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-        Locate.Roadaccident.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    phonenumber = ds.getKey();
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Mark(phonenumber,"roadaccident");
-
-                        }
-                    },0100);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-        Locate.Childmissing.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    phonenumber = ds.getKey();
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Mark(phonenumber,"childmissing");
-
-                        }
-                    },0100);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+          //  }
+       // });
 
 
 
 
-        Locate.Iamintrouble.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    phonenumber = ds.getKey();
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Mark(phonenumber,"iamintrouble");
 
-                        }
-                    },0100);
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+
+      //  Locate.EarthQuakeref.addValueEventListener(new ValueEventListener() {
+        //    @Override
+          //  public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            //    for(DataSnapshot ds : dataSnapshot.getChildren()){
+              //      phonenumber = ds.getKey();
+//
+//
+  //                          Mark(phonenumber,"earthquake");
+//
+//
+//
+  //              }
+    //        }
+
+        //    @Override
+      //      public void onCancelled(@NonNull DatabaseError databaseError) {
+
+          //  }
+       // });
+
+      //  Locate.Robbery.addValueEventListener(new ValueEventListener() {
+        //    @Override
+          //  public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            //    for(DataSnapshot ds : dataSnapshot.getChildren()){
+              //      phonenumber = ds.getKey();
+
+  //                          Mark(phonenumber,"robbery");
+//
+
+    //            }
+      //      }
+
+        //    @Override
+          //  public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            //}
+        //});
+
+
+
+
+
+
 
 
 
@@ -275,19 +222,23 @@ public class LocatePeopleMaps extends FragmentActivity implements OnMapReadyCall
     {
         Toast.makeText(LocatePeopleMaps.this,s,Toast.LENGTH_SHORT).show();
     }
-    String Latitude_,Longitude_;
+private         String Latitude_,Longitude_;
     public void Mark(String s,String y)
     {
 
+        final String phone =s;
+
         FirebaseDatabase mdatabase;
         mdatabase = FirebaseDatabase.getInstance();
-        DatabaseReference Latituderef = mdatabase.getReference("Locate/"+s+"/Latitude");
-        DatabaseReference Longituderef = mdatabase.getReference("Locate/"+s+"/Longitude");
+        DatabaseReference Latituderef = mdatabase.getReference("Locate/"+phone+"/Latitude");
+        DatabaseReference Longituderef = mdatabase.getReference("Locate/"+phone+"/Longitude");
 
       Latituderef.addValueEventListener(new ValueEventListener() {
           @Override
           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
               Latitude_ = dataSnapshot.getValue().toString();
+
+
 
           }
 
@@ -312,138 +263,35 @@ public class LocatePeopleMaps extends FragmentActivity implements OnMapReadyCall
 
 
 
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
+                mMap.addMarker(new MarkerOptions().position(location).title("Please Help").snippet(phonenumber)).showInfoWindow();
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
+
+            }
+        },2000);
 
 
 
 
-
-      if(y=="flood") {
-          Handler handler = new Handler();
-          handler.postDelayed(new Runnable() {
-              @Override
-              public void run() {
-                  LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
-                  mMap.addMarker(new MarkerOptions().position(location).title("Flood ALert").snippet(phonenumber))
-                          .showInfoWindow();
-                  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-
-
-
-
-              }
-          },4000);
-
-          // Add a marker in Sydney and move the camera
-
-
-
-      }
-
-
-        if(y=="earthquake") {
-
-            // Add a marker in Sydney and move the camera
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
-                    mMap.addMarker(new MarkerOptions().position(location).title("Earthquake ALert").snippet(phonenumber)).showInfoWindow();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-
-
-                }
-            },4000);
-        }
-
-        if(y=="landslide") {
-
-            // Add a marker in Sydney and move the camera
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
-                    mMap.addMarker(new MarkerOptions().position(location).title("LandSlide ALert").snippet(phonenumber)).showInfoWindow();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-
-                }
-            },4000);
-        }
-
-        if(y=="robbery") {
-
-            // Add a marker in Sydney and move the camera
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
-                    mMap.addMarker(new MarkerOptions().position(location).title("Robbery").snippet(phonenumber)).showInfoWindow();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-
-                }
-            },4000);
-        }
-
-
-        if(y=="roadaccident") {
-
-            // Add a marker in Sydney and move the camera
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
-                    mMap.addMarker(new MarkerOptions().position(location).title("Road Accident").snippet(phonenumber)).showInfoWindow();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-
-                }
-            },4000);
-        }
-
-        if(y=="childmissing") {
-
-            // Add a marker in Sydney and move the camera
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
-                    mMap.addMarker(new MarkerOptions().position(location).title("Child Missing").snippet(phonenumber)).showInfoWindow();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-
-                }
-            },4000);
-        }
-
-
-        if(y=="iamintrouble") {
-
-            // Add a marker in Sydney and move the camera
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    LatLng location = new LatLng(Double.parseDouble(Latitude_), Double.parseDouble(Longitude_));
-                    mMap.addMarker(new MarkerOptions().position(location).title("Please Help").snippet(phonenumber)).showInfoWindow();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-
-                }
-            },4000);
-        }
 
 
 
 
 
     }
+
+
+
+
+
+
+
+
+
 
 
 

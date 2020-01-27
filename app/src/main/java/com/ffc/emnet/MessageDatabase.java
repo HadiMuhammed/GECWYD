@@ -10,5 +10,6 @@ public interface MessageDatabase {
      String muser=mauth.getCurrentUser().getPhoneNumber();
      FirebaseDatabase database=FirebaseDatabase.getInstance();
      DatabaseReference inboxref=database.getReference("InboxOf/"+muser);
+     DatabaseReference inboxofref = database.getReference("InboxOf/");
 
 }

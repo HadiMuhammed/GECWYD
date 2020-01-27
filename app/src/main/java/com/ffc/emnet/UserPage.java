@@ -12,6 +12,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.RequiresApi;
@@ -51,9 +52,16 @@ public class UserPage extends AppCompatActivity implements Locate{
             public void onClick(View view) {
                 Snackbar.make(view, "Loading Inbox", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                Intent intent = new Intent(getApplicationContext(),ProfileChatActivity.class);
-                intent.putExtra("Phone Number",Locate.CurrentUserPhoneNumber);
-                startActivity(intent);
+                final Intent intent = new Intent(getApplicationContext(),ProfileActivity.class);
+                intent.putExtra("PhoneNumber",Locate.CurrentUserPhoneNumber);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(intent);
+                    }
+                },3000);
+
             }
         });
 
