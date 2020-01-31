@@ -14,6 +14,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -29,6 +30,7 @@ import com.squareup.picasso.Picasso;
 
 public class ItemUploadActivity extends AppCompatActivity implements PublicChatDatabase{
     private EditText textbox;
+    private ProgressBar progressBar;
     private Button videobtn;
     private Button imagebtn;
     private Button uploader;
@@ -46,7 +48,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_upload);
-
+        progressBar = (ProgressBar) findViewById(R.id.progressuploads);
         videobtn = (Button) findViewById(R.id.videoupload);
         imagebtn = (Button) findViewById(R.id.imageoupload);
         uploader = (Button) findViewById(R.id.uploadbuttonforpublic);
@@ -75,6 +77,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
        videobtn.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View view) {
+
                chooseVideo();
            }
        });
@@ -119,6 +122,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
     private String imageuri;
     private String videouri;
     private void UploadFiles(){
+        progressBar.setVisibility(View.VISIBLE);
         if(Itemuri!=null)
         {
             final StorageReference fileref =storageReference.child(System.currentTimeMillis()+"."+getFileEx(Itemuri));
@@ -126,7 +130,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(ItemUploadActivity.this,"Uploaded",Toast.LENGTH_LONG).show();
-
+                    progressBar.setVisibility(View.GONE);
 
                     fileref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
@@ -187,12 +191,18 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
             Itemuri=data.getData();
             Picasso.with(this).load(Itemuri).into(Imageuploadview);
             Imageuploadview.setVisibility(View.VISIBLE);
+            Videouploadview.setVideoURI(null);
+            Videouploadview.setVisibility(View.GONE);
+
         }
         if(requestCode==CHOOSE_VIDEO&& resultCode==RESULT_OK&&data!=null&&data.getData()!=null){
 
             Itemuri=data.getData();
             Videouploadview.setVideoURI(Itemuri);
             Videouploadview.setVisibility(View.VISIBLE);
+            Videouploadview.seekTo(1);
+            Imageuploadview.setImageURI(null);
+            Imageuploadview.setVisibility(View.GONE);
         }
     }
 

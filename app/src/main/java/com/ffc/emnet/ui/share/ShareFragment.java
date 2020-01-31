@@ -225,6 +225,7 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
                         return true;
                     }
                 });
+                video.seekTo(1);
 
                 Animation animation = AnimationUtils.loadAnimation(getActivity(),R.anim.newanim);
                 view.startAnimation(animation);
