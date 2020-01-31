@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -142,6 +143,10 @@ public class SendFragment extends Fragment {
                 imgPhone.setText(PhoneNumber.get(i));
                 Picasso.with(getActivity()).load((url.get(i))).into(imgView);
                    // imgView.setImageURI(Uri.parse(url.get(i)));
+
+
+
+
                 return view;
 
             }
