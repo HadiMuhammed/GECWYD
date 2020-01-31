@@ -147,6 +147,16 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
                                 videouri = "no uri";
                                 imageuri =  uri.toString();
                             }
+                            if(getFileEx(Itemuri)== "png")
+                            {
+                                videouri = "no uri";
+                                imageuri =  uri.toString();
+                            }
+                            if(getFileEx(Itemuri)== "gif")
+                            {
+                                videouri = "no uri";
+                                imageuri =  uri.toString();
+                            }
                             Upload2 upload = new Upload2(textbox.getText().toString().trim(),imageuri,message.trim(),videouri,PublicChatDatabase.muser.toString());
                             String uploadID=databaseReference.push().getKey();
                             databaseReference.child(Locate.CurrentUserPhoneNumber).child(uploadID).setValue(upload);
