@@ -1,8 +1,10 @@
 package com.ffc.emnet.ui.share;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -16,21 +18,38 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.VideoView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ffc.emnet.ItemUploadActivity;
-import com.ffc.emnet.Locate;
 import com.ffc.emnet.PublicChatDatabase;
 import com.ffc.emnet.R;
-import com.ffc.emnet.Upload;
 import com.ffc.emnet.Upload2;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.video.VideoListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,6 +58,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+import com.universalvideoview.UniversalMediaController;
+import com.universalvideoview.UniversalVideoView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +91,8 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
         shareViewModel =
                 ViewModelProviders.of(this).get(ShareViewModel.class);
         View root = inflater.inflate(R.layout.fragment_share, container, false);
+
+
         messagebox = (EditText) root.findViewById(R.id.textGroup);
         send = (Button) root.findViewById(R.id.SendButtonForPublic);
         Phonenumber = PublicChatDatabase.muser;
@@ -95,8 +118,8 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
             }
         },3000);
 
-
-
+                messages.setSmoothScrollbarEnabled(true);
+                messages.canScrollVertically(-1);
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,7 +127,7 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
                 if(messagebox.getText() != null) {
                     Upload2 upload = new Upload2(messagebox.getText().toString(),"no uri","nothing","no uri",PublicChatDatabase.muser);
                     String uploadID=mref.push().getKey();
-                    mref.child(Locate.CurrentUserPhoneNumber).child(uploadID).setValue(upload);
+                    mref.push().child(uploadID).setValue(upload);
 
                     messagebox.setText("");
                 }
@@ -123,6 +146,7 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
                 urlforvideo.clear();
                 phonenumber.clear();
 
+
                 for(DataSnapshot ks : dataSnapshot.getChildren())
                     for(DataSnapshot ds : ks.getChildren()){
 
@@ -135,7 +159,9 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
                         phonenumber.add(upload.getPhonenumber());
 
                     }
+
                 customadaptorForpublic.notifyDataSetChanged();
+
 
 
 
@@ -171,8 +197,22 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
 
     }
 
+    public  class CustomMediaController extends MediaController{
+        public CustomMediaController(Context c,View anchor){
+            super(c);
+            super.setAnchorView(anchor);
 
-    public class CustomadaptorForpublic extends BaseAdapter{
+        }
+        @Override
+        public void setAnchorView(View view)
+        {
+            //do nothing
+        }
+    }
+
+
+
+    public class CustomadaptorForpublic extends BaseAdapter {
 
         @Override
         public int getCount() {
@@ -189,8 +229,9 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
             return 0;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(final int i, View view, ViewGroup viewGroup) {
             try{
                 if(view == null)
                 {
@@ -199,36 +240,134 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
                 TextView phonenumber1 = (TextView) view.findViewById(R.id.phonenumberInThePublicChat);
                 TextView username1 = (TextView) view.findViewById(R.id.usernameInThePublicChat);
                 TextView message = (TextView) view.findViewById(R.id.messageInThePublicChat);
-                ImageView image = (ImageView) view.findViewById(R.id.ImageinthePublicChat);
-                final VideoView video = (VideoView) view.findViewById(R.id.VideointhePublicChat);
+                final ImageView image = (ImageView) view.findViewById(R.id.ImageinthePublicChat);
+              //  final SimpleExoPlayerView simpleExoPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.VideointhePublicChat);
+               // final SimpleExoPlayer simpleExoPlayer;
+                //BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+               // TrackSelector trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
+                //simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(),trackSelector);
+                //DefaultHttpDataSourceFactory dataSource = new DefaultHttpDataSourceFactory("Exoplayer");
+                //ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+                //MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(urlforvideo.get(i)),dataSource,extractorsFactory,null,null);
+              //final MediaPlayer mp = new MediaPlayer();
+               // simpleExoPlayerView.setPlayer(simpleExoPlayer);
+               /// simpleExoPlayer.prepare(mediaSource);
+               // simpleExoPlayer.setPlayWhenReady(false);
+                //simpleExoPlayerView.getLayoutParams().width=10;
+                //simpleExoPlayerView.getLayoutParams().height=10;
+               // simpleExoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+
+
 
                 phonenumber1.setText(phonenumber.get(i));
                 message.setText(imageName.get(i));
                 Picasso.with(getActivity()).load((urlforimage.get(i))).into(image);
                 image.setVisibility(View.VISIBLE);
-                video.setVideoURI(Uri.parse(urlforvideo.get(i)));
-                video.setVisibility(View.VISIBLE);
-                video.setMediaController(new MediaController(getActivity()));
-               // video.start();
+               final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressforpublicchat);
 
-                video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                final UniversalVideoView universalVideoView = (UniversalVideoView) view.findViewById(R.id.VideointhePublicChat);
+                final UniversalMediaController universalMediaController = (UniversalMediaController) view.findViewById(R.id.media_controller);
+
+                universalVideoView.setMediaController(universalMediaController);
+
+                universalMediaController.hideError();
+
+                universalVideoView.setVideoURI(Uri.parse(urlforvideo.get(i)));
+                universalVideoView.getLayoutParams().height=10;
+                universalVideoView.getLayoutParams().width=10;
+                universalMediaController.getLayoutParams().height=10;
+                universalMediaController.getLayoutParams().width=10;
+                progressBar.setVisibility(View.VISIBLE);
+
+                universalVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+
                     @Override
-                    public void onCompletion(MediaPlayer mediaPlayer) {
-                       // video.setVisibility(View.GONE);
+                    public void onPrepared(MediaPlayer mediaPlayer) {
+
+                        universalVideoView.getLayoutParams().height=800;
+                        universalVideoView.getLayoutParams().width=800;
+
+                        universalMediaController.getLayoutParams().height= ViewGroup.LayoutParams.MATCH_PARENT;
+                        universalMediaController.getLayoutParams().width=ViewGroup.LayoutParams.MATCH_PARENT;
+                        mediaPlayer.seekTo(1);
+                        progressBar.getLayoutParams().width= ViewGroup.LayoutParams.WRAP_CONTENT;
+                        progressBar.getLayoutParams().height=ViewGroup.LayoutParams.WRAP_CONTENT;
+                       // progressBar.setVisibility(View.VISIBLE);
                     }
                 });
-                video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+
+
+                universalVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                     @Override
                     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                        video.setVisibility(View.GONE);
-
+                        universalVideoView.getLayoutParams().height=10;
+                        universalVideoView.getLayoutParams().width=10;
+                        universalMediaController.getLayoutParams().height=10;
+                        universalMediaController.getLayoutParams().width=10;
+                        universalVideoView.seekTo(1);
+                        progressBar.getLayoutParams().width=1;
+                        progressBar.getLayoutParams().height=1;
                         return true;
                     }
                 });
-                video.seekTo(1);
 
-                Animation animation = AnimationUtils.loadAnimation(getActivity(),R.anim.newanim);
-                view.startAnimation(animation);
+
+
+
+
+
+            //   video.setVideoURI(Uri.parse(urlforvideo.get(i)));
+              // video.setVisibility(View.VISIBLE);
+            //   progressBar.setVisibility(View.VISIBLE);
+                //   MediaController mediaController = new MediaController(getActivity());
+              //     video.setMediaController(mediaController);
+                //   mediaController.setAnchorView(video);
+                  //     video.seekTo(1);
+                    //   video.start();
+              //  final View finalView = view;
+
+
+
+
+
+             //   final MediaController mc = new MediaController(getActivity());
+              //  final  CustomMediaController mc = new CustomMediaController(getContext(), video);
+            //    mc.setMediaPlayer(video);
+               // mc.setAnchorView(video);
+          //      video.setMediaController(mc);
+               // video.requestFocus();
+
+
+
+
+
+              //  video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                  ///  @Override
+                ///    public void onCompletion(MediaPlayer mediaPlayer) {
+                       // video.setVisibility(View.GONE);
+                   // }
+                //});
+            //    video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+              //      @Override
+                //    public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                  //      video.setVisibility(View.GONE);
+                    //    return true;
+                   // }
+               // });
+               // video.seekTo(1);
+
+
+
+                //view.clearAnimation();
+
+            Animation animation = AnimationUtils.loadAnimation(getActivity(),R.anim.newanim);
+            view.startAnimation(animation);
+            messages.notify();
+
+
+                //simpleExoPlayer.release();
                 return view;
 
 
@@ -242,5 +381,10 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
 
             return view;
         }
+
+
+
     }
+
+
 }

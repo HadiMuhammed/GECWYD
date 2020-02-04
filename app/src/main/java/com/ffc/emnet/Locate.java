@@ -25,11 +25,13 @@ public interface Locate {
      DatabaseReference Floodref = database.getReference("FLOOD");
      DatabaseReference LandSlideref = database.getReference("LANDSLIDE");
      DatabaseReference EarthQuakeref = database.getReference("EARTHQUAKE");
+     DatabaseReference Fireref = database.getReference("FIRE");
      DatabaseReference Robbery = database.getReference("ROBBERY");
      DatabaseReference Roadaccident = database.getReference("ROADACCIDENT");
      DatabaseReference Childmissing = database.getReference("CHILDMISSING");
      DatabaseReference Iamintrouble = database.getReference("IAMINTROUBLE");
      DatabaseReference Events = database.getReference("Events");
+     DatabaseReference notification = database.getReference("notification");
 
 
      FirebaseAuth mAuth = FirebaseAuth.getInstance();

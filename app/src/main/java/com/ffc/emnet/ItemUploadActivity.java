@@ -163,7 +163,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
                             }
                             Upload2 upload = new Upload2(textbox.getText().toString().trim(),imageuri,message.trim(),videouri,PublicChatDatabase.muser.toString());
                             String uploadID=databaseReference.push().getKey();
-                            databaseReference.child(Locate.CurrentUserPhoneNumber).child(uploadID).setValue(upload);
+                            databaseReference.push().child(uploadID).setValue(upload);
 
                         }
                     });

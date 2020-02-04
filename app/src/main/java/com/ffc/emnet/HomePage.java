@@ -4,9 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
@@ -20,8 +23,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class HomePage extends AppCompatActivity implements  Locate {
 GridView listview;
-String[] Items = {"Flood","Land Slide","Earth Quake"};
-int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth};
+String[] Items = {"Flood","Land Slide","Earth Quake","Fire"};
+int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth,R.drawable.fire};
 
 
     @Override
@@ -31,6 +34,9 @@ int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth};
     listview =  (GridView) findViewById(R.id.listview);
     CustomAdapter customAdapter = new CustomAdapter();
     listview.setAdapter(customAdapter);
+
+
+
 
 
 
@@ -58,7 +64,16 @@ int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth};
                 Intent intent = new Intent(HomePage.this, EventsActivity.class);
                 startActivity(intent);
             }
+            else if(i==3)
+            {
+                Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
+                Locate.Fireref.child(Locate.CurrentUserPhoneNumber).setValue("");
+                Intent intent = new Intent(HomePage.this, EventsActivity.class);
+                startActivity(intent);
+            }
 
+            Animation animation = AnimationUtils.loadAnimation(HomePage.this,R.anim.newanim);
+            listview.getChildAt(i).startAnimation(animation);
         }
     });
 
@@ -92,6 +107,10 @@ int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth};
                 TextView textView = (TextView) view.findViewById(R.id.title);
                 textView.setText(Items[i]);
                 imageView.setImageResource(Images[i]);
+
+
+            Animation animation = AnimationUtils.loadAnimation(HomePage.this,R.anim.newanim);
+            view.startAnimation(animation);
             return view;
         }
 

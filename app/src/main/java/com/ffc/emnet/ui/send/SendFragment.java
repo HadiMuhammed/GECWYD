@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -21,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.ffc.emnet.HomePage;
 import com.ffc.emnet.LocatePeopleMaps;
 import com.ffc.emnet.R;
 import com.ffc.emnet.Upload;
@@ -102,7 +105,7 @@ public class SendFragment extends Fragment {
                             String Phone;
                             Phone = PhoneNumber.get(i);
                            final Intent intent = new Intent(getActivity(), LocatePeopleMaps.class);
-                            intent.putExtra("Phone Number",Phone);
+                            intent.putExtra("Phone Number 1",Phone);
                             startActivity(intent);
 
 
@@ -145,7 +148,8 @@ public class SendFragment extends Fragment {
                    // imgView.setImageURI(Uri.parse(url.get(i)));
 
 
-
+                Animation animation = AnimationUtils.loadAnimation(getActivity(),R.anim.newanim);
+                view.startAnimation(animation);
 
                 return view;
 

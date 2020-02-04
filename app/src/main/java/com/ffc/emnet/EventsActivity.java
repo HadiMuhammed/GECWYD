@@ -3,11 +3,19 @@ package com.ffc.emnet;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -16,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.ffc.emnet.ui.home.HomeFragment;
+import com.ffc.emnet.ui.send.SendFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +34,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+
+import java.util.Random;
 
 public class EventsActivity extends AppCompatActivity implements Locate {
 private static final int CHOOSE_IMAGE=1;
@@ -92,6 +104,17 @@ private ProgressBar eprogress;
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(EventsActivity.this,"Uploaded",Toast.LENGTH_LONG).show();
+                    Random random = new Random();
+                    Locate.notification.setValue("People needs your help. Watch Events "+"ID:"+random.nextInt());
+             //       HomeFragment homeFragment = new HomeFragment();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ShowNotification("Alert", "Donot forget to delete events");
+
+                        }
+                    },2000);
 
 
                     fileref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -130,4 +153,48 @@ private ProgressBar eprogress;
             Picasso.with(this).load(imguri).into(eImage);
         }
     }
+
+    public void ShowNotification(String title,String Message) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(EventsActivity.this);
+        Intent intent = new Intent(EventsActivity.this, SendFragment.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(EventsActivity.this, 01, intent, 0);
+        builder.setContentIntent(pendingIntent);
+        builder.setDefaults(Notification.DEFAULT_ALL);
+        builder.setContentText(Message);
+        builder.setContentTitle(title);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(001, builder.build());
+    }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // CharSequence name = getString("channel");
+            //String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("channel", "channel", importance);
+            channel.setDescription("Disaster Management");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager1 = getSystemService(NotificationManager.class);
+            notificationManager1.createNotificationChannel(channel);
+
+
+
+
+            Notification newMessageNotification = new Notification.Builder(EventsActivity.this, "channel")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(title)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setContentText(Message)
+                    .build();
+
+// Issue the notification.
+            NotificationManagerCompat notificationManager3 = NotificationManagerCompat.from(EventsActivity.this);
+            notificationManager3.notify(001, newMessageNotification);
+
+
+        }
+    }
+
+
 }

@@ -107,35 +107,36 @@ public class LocatePeopleMaps extends FragmentActivity implements OnMapReadyCall
            }
        });
 
+          //  Intent intent2 = getIntent();
+            //String phonenumber = intent2.getStringExtra("Phone Number 1");
 
 
 
+  // Locate.Floodref.addValueEventListener(new ValueEventListener() {
+    //   @Override
+      // public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        //   for(DataSnapshot ds : dataSnapshot.getChildren()){
+          //  phonenumber = ds.getKey();
+            //           Mark(phonenumber,"flood");
 
-   Locate.Floodref.addValueEventListener(new ValueEventListener() {
-       @Override
-       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-           for(DataSnapshot ds : dataSnapshot.getChildren()){
-            phonenumber = ds.getKey();
-                       Mark(phonenumber,"flood");
+//
+  //         }
+    //   }
 
+//       @Override
+  //     public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+  //     }
+   //}//);
 
-           }
-       }
-
-       @Override
-       public void onCancelled(@NonNull DatabaseError databaseError) {
-
-       }
-   });
-
-
+    Message("Locating the Phonenumber..");
 
                 final Intent intent = getIntent();
                 Handler mhandler = new Handler();
                 mhandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        phonenumber=intent.getStringExtra("Phone Number");
+                        phonenumber=intent.getStringExtra("Phone Number 1");
                         Mark(phonenumber,"a");
                     }
                 }, 3000);
@@ -220,7 +221,7 @@ public class LocatePeopleMaps extends FragmentActivity implements OnMapReadyCall
     }
     public void Message(String s)
     {
-        Toast.makeText(LocatePeopleMaps.this,s,Toast.LENGTH_SHORT).show();
+        Toast.makeText(LocatePeopleMaps.this,s,Toast.LENGTH_LONG).show();
     }
 private         String Latitude_,Longitude_;
     public void Mark(String s,String y)
