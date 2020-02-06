@@ -2,6 +2,7 @@ package com.ffc.emnet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
@@ -11,6 +12,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,24 +58,29 @@ private ProgressBar progressbar;
         loginBtn =  (Button) findViewById(R.id.loginbtn);
         phoneNumber = (EditText) findViewById(R.id.phonenumber);
         mAuth = FirebaseAuth.getInstance();
+//        ConstraintLayout constraintLayout = findViewById(R.id.layout);
+  //      AnimationDrawable animationDrawable = (AnimationDrawable) constraintLayout.getBackground();
+    //    animationDrawable.setEnterFadeDuration(2000);
+      //  animationDrawable.setExitFadeDuration(4000);
+        //animationDrawable.start();
         checklogin();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
 
-                ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+                ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_CONTACTS,Manifest.permission.READ_EXTERNAL_STORAGE},1);
 
                 //finish();
 
 
-                // Intent intent1 = new Intent(ProfileActivity.this,ProfileActivity.class);
-                // startActivity(intent1);
-                // finish();
-
-
-
                 //  return;
             }
+
+
+
+
+
+
         }
 
 

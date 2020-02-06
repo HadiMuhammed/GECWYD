@@ -1,17 +1,26 @@
 package com.ffc.emnet.ui.share;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Camera;
+import android.hardware.camera2.CameraManager;
 import android.media.MediaPlayer;
+import android.media.MediaSync;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.ResultReceiver;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,16 +29,25 @@ import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.ffc.emnet.ItemUploadActivity;
+import com.ffc.emnet.Locate;
+import com.ffc.emnet.LocatePeopleMaps;
+import com.ffc.emnet.ProfileActivity;
+import com.ffc.emnet.ProfileChatActivity;
 import com.ffc.emnet.PublicChatDatabase;
 import com.ffc.emnet.R;
 import com.ffc.emnet.Upload2;
+import com.ffc.emnet.Upload3;
+import com.ffc.emnet.UserPage;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -61,8 +79,19 @@ import com.squareup.picasso.Picasso;
 import com.universalvideoview.UniversalMediaController;
 import com.universalvideoview.UniversalVideoView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.firekast.FKCamera;
+import io.firekast.FKCameraFragment;
+import io.firekast.FKError;
+import io.firekast.FKStream;
+import io.firekast.FKStreamer;
+import io.firekast.Firekast;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 public class ShareFragment extends Fragment implements PublicChatDatabase {
 
@@ -79,10 +108,28 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
     private List<String> urlforimage;
     private List<String> urlforvideo;
     private List<String> phonenumber;
+    private List<Upload3> mUploads2;
+    private List<String> imageName2;
+    private List<String> videoName2;
+    private List<String> message2;
+    private List<String> urlforimage2;
+    private List<String> urlforvideo2;
+    private List<String> phonenumber2;
     private StorageReference storageReference;
     private DatabaseReference mref;
     private Button upload;
+    private  DatabaseReference usernameref;
+    private String Username;
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 12)
+        {
+
+        }
+    }
 
 
 
@@ -91,6 +138,7 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
         shareViewModel =
                 ViewModelProviders.of(this).get(ShareViewModel.class);
         View root = inflater.inflate(R.layout.fragment_share, container, false);
+
 
 
         messagebox = (EditText) root.findViewById(R.id.textGroup);
@@ -109,6 +157,53 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
         storageReference = FirebaseStorage.getInstance().getReference("/Public/");
         mref = FirebaseDatabase.getInstance().getReference("/PublicChat/");
         upload =  (Button) root.findViewById(R.id.uploadbuttonforimageandvideo);
+        usernameref = database.getReference("Users/" + Locate.CurrentUserPhoneNumber);
+        Username=null;
+
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            int permission = getActivity().checkSelfPermission(Manifest.permission.CAMERA);
+
+            int permission2 = getActivity().checkSelfPermission(Manifest.permission.RECORD_AUDIO);
+            if(permission == PackageManager.PERMISSION_DENIED || permission2 == PackageManager.PERMISSION_DENIED)
+            {
+                ActivityCompat.requestPermissions(getActivity(),new String[] {Manifest.permission.CAMERA,Manifest.permission.RECORD_AUDIO},10);
+            }
+            else if(permission == PackageManager.PERMISSION_GRANTED && permission2 == PackageManager.PERMISSION_GRANTED)
+            {
+                if(hasCamera()) {
+
+
+                }
+            }
+        }
+
+
+
+
+
+
+        usernameref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    Username = dataSnapshot.getValue().toString();
+                    //  Phonenumber = dataSnapshot.getKey();
+
+                }catch(Exception e){
+
+                }
+            }
+
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         Handler mhandler = new Handler();
         mhandler.postDelayed(new Runnable() {
@@ -125,7 +220,7 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
             @Override
             public void onClick(View view) {
                 if(messagebox.getText() != null) {
-                    Upload2 upload = new Upload2(messagebox.getText().toString(),"no uri","nothing","no uri",PublicChatDatabase.muser);
+                    Upload2 upload = new Upload2(messagebox.getText().toString(),"no uri", Username,"no uri",PublicChatDatabase.muser);
                     String uploadID=mref.push().getKey();
                     mref.push().child(uploadID).setValue(upload);
 
@@ -181,8 +276,11 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(getActivity(), ItemUploadActivity.class);
-                    intent.putExtra("message",messagebox.getText());
+                    intent.putExtra("username",Username);
+                    if(!Username.isEmpty())
                     startActivity(intent);
+                    else
+                        Toast.makeText(getActivity(),"Please Wait..",Toast.LENGTH_SHORT).show();
 
 
                 }
@@ -190,6 +288,21 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
 
 
 
+
+            messages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    String Phone;
+                    Phone = phonenumber.get(i);
+                    final Intent intent = new Intent(getActivity(), LocatePeopleMaps.class);
+                    intent.putExtra("Phone Number 1",Phone);
+                    startActivity(intent);
+
+
+
+                }
+            });
 
 
         return root;
@@ -210,6 +323,17 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
         }
     }
 
+
+
+
+    private boolean hasCamera() {
+        if (getActivity().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_CAMERA_FRONT)){
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
     public class CustomadaptorForpublic extends BaseAdapter {
@@ -238,24 +362,14 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
                     view =  getLayoutInflater().inflate(R.layout.customlayoutforpublic,null);
                 }
                 TextView phonenumber1 = (TextView) view.findViewById(R.id.phonenumberInThePublicChat);
-                TextView username1 = (TextView) view.findViewById(R.id.usernameInThePublicChat);
+                final TextView username1 = (TextView) view.findViewById(R.id.usernameInThePublicChat);
                 TextView message = (TextView) view.findViewById(R.id.messageInThePublicChat);
                 final ImageView image = (ImageView) view.findViewById(R.id.ImageinthePublicChat);
-              //  final SimpleExoPlayerView simpleExoPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.VideointhePublicChat);
-               // final SimpleExoPlayer simpleExoPlayer;
-                //BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-               // TrackSelector trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
-                //simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(),trackSelector);
-                //DefaultHttpDataSourceFactory dataSource = new DefaultHttpDataSourceFactory("Exoplayer");
-                //ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-                //MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(urlforvideo.get(i)),dataSource,extractorsFactory,null,null);
-              //final MediaPlayer mp = new MediaPlayer();
-               // simpleExoPlayerView.setPlayer(simpleExoPlayer);
-               /// simpleExoPlayer.prepare(mediaSource);
-               // simpleExoPlayer.setPlayWhenReady(false);
-                //simpleExoPlayerView.getLayoutParams().width=10;
-                //simpleExoPlayerView.getLayoutParams().height=10;
-               // simpleExoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+
+
+
+
+                username1.setText(videoName.get(i));
 
 
 
@@ -318,53 +432,10 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
 
 
 
-            //   video.setVideoURI(Uri.parse(urlforvideo.get(i)));
-              // video.setVisibility(View.VISIBLE);
-            //   progressBar.setVisibility(View.VISIBLE);
-                //   MediaController mediaController = new MediaController(getActivity());
-              //     video.setMediaController(mediaController);
-                //   mediaController.setAnchorView(video);
-                  //     video.seekTo(1);
-                    //   video.start();
-              //  final View finalView = view;
-
-
-
-
-
-             //   final MediaController mc = new MediaController(getActivity());
-              //  final  CustomMediaController mc = new CustomMediaController(getContext(), video);
-            //    mc.setMediaPlayer(video);
-               // mc.setAnchorView(video);
-          //      video.setMediaController(mc);
-               // video.requestFocus();
-
-
-
-
-
-              //  video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                  ///  @Override
-                ///    public void onCompletion(MediaPlayer mediaPlayer) {
-                       // video.setVisibility(View.GONE);
-                   // }
-                //});
-            //    video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-              //      @Override
-                //    public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                  //      video.setVisibility(View.GONE);
-                    //    return true;
-                   // }
-               // });
-               // video.seekTo(1);
-
-
-
-                //view.clearAnimation();
-
             Animation animation = AnimationUtils.loadAnimation(getActivity(),R.anim.newanim);
             view.startAnimation(animation);
             messages.notify();
+
 
 
                 //simpleExoPlayer.release();
@@ -385,6 +456,7 @@ public class ShareFragment extends Fragment implements PublicChatDatabase {
 
 
     }
+
 
 
 }

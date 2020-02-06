@@ -1,11 +1,15 @@
 package com.ffc.emnet.ui.home;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.Notification.Builder;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,11 +24,15 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ContentView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationBuilderWithBuilderAccessor;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -36,6 +44,7 @@ import com.ffc.emnet.HomePage;
 import com.ffc.emnet.Locate;
 import com.ffc.emnet.MainActivity;
 import com.ffc.emnet.R;
+import com.ffc.emnet.SosSetting;
 import com.ffc.emnet.ui.send.SendFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -54,8 +63,8 @@ public class HomeFragment extends Fragment {
     private String datapath;
     private DatabaseReference dref;
     private GridView HomeItems;
-    private String[] Items = {"Natural Disaster","Robbery","Road Accident","Child Missing","Iam in Trouble","Delete Alerts"};
-    private int[] Images = {R.drawable.natural_disaster,R.drawable.download,R.drawable.acccident,R.drawable.child,R.drawable.trouble,R.drawable.delete};
+    private String[] Items = {"Natural Disaster","Robbery","Road Accident","Child Missing","Iam in Trouble","Delete Alerts","Set SOS","Delete SOS List"};
+    private int[] Images = {R.drawable.natural_disaster,R.drawable.download,R.drawable.acccident,R.drawable.child,R.drawable.trouble,R.drawable.delete,R.drawable.ic_call,R.drawable.delete};
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -67,7 +76,7 @@ public class HomeFragment extends Fragment {
 
 
 
-
+        getActivity().startService(new Intent(getActivity(),MyService.class));
 
 
 
@@ -87,28 +96,28 @@ public class HomeFragment extends Fragment {
                 }
               else  if(i==1)
                 {
-                    Message("ALert is Send");
+                 //   Message("ALert is Send");
                     Locate.Robbery.child(Locate.CurrentUserPhoneNumber).setValue("");
                     Intent intent = new Intent(getActivity(), EventsActivity.class);
                     startActivity(intent);
                 }
               else if(i==2)
                 {
-                    Message("ALert is Send");
+                   // Message("ALert is Send");
                     Locate.Roadaccident.child(Locate.CurrentUserPhoneNumber).setValue("");
                     Intent intent = new Intent(getActivity(), EventsActivity.class);
                     startActivity(intent);
                 }
               else  if(i==3)
                 {
-                    Message("ALert is Send");
+                    //Message("ALert is Send");
                     Locate.Childmissing.child(Locate.CurrentUserPhoneNumber).setValue("");
                     Intent intent = new Intent(getActivity(), EventsActivity.class);
                     startActivity(intent);
                 }
               else if(i==4)
                 {
-                    Message("ALert is Send");
+                   // Message("ALert is Send");
                     Locate.Iamintrouble.child(Locate.CurrentUserPhoneNumber).setValue("");
                     Intent intent = new Intent(getActivity(), EventsActivity.class);
                     startActivity(intent);
@@ -132,25 +141,31 @@ public class HomeFragment extends Fragment {
 
 
                 }
-            }
-        });
+              else if(i==6)
+                {
+                    if (getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ) {
 
-        Locate.notification.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    if (!dataSnapshot.getValue(String.class).isEmpty())
-                        ShowNotification("Help", dataSnapshot.getValue(String.class));
-                } catch (Exception e) {
+
+                        ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.READ_CONTACTS},1);
+
+
+                    }
+                    else
+                    {
+                    Intent intent = new Intent(getActivity(), SosSetting.class);
+                    startActivity(intent);
+                    }
+                }
+              else if(i==7)
+                {
+                    Locate.SOS.child(Locate.CurrentUserPhoneNumber).removeValue();
+                    Toast.makeText(getActivity(),"SoS list Deleted !",Toast.LENGTH_SHORT).show();
 
                 }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
         });
+
+
 
 
 
@@ -161,40 +176,32 @@ public class HomeFragment extends Fragment {
     public void ShowNotification(String title,String Message) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
-            Intent intent = new Intent(getActivity(), SendFragment.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 01, intent, 0);
-            builder.setContentIntent(pendingIntent);
             builder.setDefaults(Notification.DEFAULT_ALL);
             builder.setContentText(Message);
             builder.setContentTitle(title);
-            builder.setSmallIcon(R.mipmap.ic_launcher);
+            builder.setSmallIcon(R.drawable.exo_notification_small_icon);
             NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.notify(001, builder.build());
+           notificationManager.notify(001, builder.build());
+
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // CharSequence name = getString("channel");
-            //String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("channel", "channel", importance);
+            NotificationChannel channel = new NotificationChannel("channel_id", "channel_name", importance);
             channel.setDescription("Disaster Management");
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager1 = getActivity().getSystemService(NotificationManager.class);
-            notificationManager1.createNotificationChannel(channel);
+            NotificationManager manager = getActivity().getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
 
+           NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+           Notification notification = new NotificationCompat.Builder(getActivity(),"channel_id")
+                   .setSmallIcon(R.drawable.exo_notification_small_icon)
+                   .setDefaults(Notification.DEFAULT_ALL)
+                   .setContentText(Message)
+                   .setContentTitle(title)
+                   .setPriority(NotificationCompat.PRIORITY_HIGH)
+                   .build()
+                   ;
 
-
-
-            Notification newMessageNotification = new Notification.Builder(getActivity(), "channel")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle(title)
-                    .setDefaults(Notification.DEFAULT_ALL)
-                    .setContentText(Message)
-                    .build();
-
-// Issue the notification.
-            NotificationManagerCompat notificationManager3 = NotificationManagerCompat.from(getActivity());
-            notificationManager3.notify(001, newMessageNotification);
+           notificationManager.notify(001,notification);
 
 
         }
@@ -239,11 +246,6 @@ public class HomeFragment extends Fragment {
         }
 
     }
-
-
-
-
-
 
 
 

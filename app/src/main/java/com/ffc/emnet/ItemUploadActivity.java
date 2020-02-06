@@ -21,8 +21,11 @@ import android.widget.VideoView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -32,6 +35,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
     private EditText textbox;
     private ProgressBar progressBar;
     private Button videobtn;
+    private String Username;
     private Button imagebtn;
     private Button uploader;
     private ImageView Imageuploadview;
@@ -44,6 +48,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
     private FirebaseStorage firebaseStorage;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+    private DatabaseReference usernameref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +64,32 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("PublicChat/");
         textbox = (EditText) findViewById(R.id.textboxforupload);
+        usernameref = database.getReference("Users/" + Locate.CurrentUserPhoneNumber);
+        Username=null;
+        usernameref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    Username = dataSnapshot.getValue().toString();
+                    //  Phonenumber = dataSnapshot.getKey();
+
+                }catch(Exception e){
+
+                }
+            }
+
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
+
         Handler mhandler = new Handler();
         mhandler.postDelayed(new Runnable() {
             @Override
@@ -132,6 +163,7 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
                     Toast.makeText(ItemUploadActivity.this,"Uploaded",Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.GONE);
 
+                   
                     fileref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
@@ -161,10 +193,17 @@ public class ItemUploadActivity extends AppCompatActivity implements PublicChatD
                                 videouri = "no uri";
                                 imageuri =  uri.toString();
                             }
-                            Upload2 upload = new Upload2(textbox.getText().toString().trim(),imageuri,message.trim(),videouri,PublicChatDatabase.muser.toString());
-                            String uploadID=databaseReference.push().getKey();
-                            databaseReference.push().child(uploadID).setValue(upload);
-
+                            if(!textbox.getText().toString().isEmpty()) {
+                                Upload2 upload = new Upload2(textbox.getText().toString().trim(), imageuri, Username, videouri, PublicChatDatabase.muser.toString());
+                                String uploadID = databaseReference.push().getKey();
+                                databaseReference.push().child(uploadID).setValue(upload);
+                            }
+                            else
+                            {
+                                Upload2 upload = new Upload2(" ", imageuri, Username, videouri, PublicChatDatabase.muser.toString());
+                                String uploadID = databaseReference.push().getKey();
+                                databaseReference.push().child(uploadID).setValue(upload);
+                            }
                         }
                     });
 

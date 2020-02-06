@@ -1,7 +1,6 @@
 package com.ffc.emnet;
 
-public class Upload2 {
-
+public class Upload3 {
 
     private String imgname;
     private String imgurl;
@@ -9,12 +8,19 @@ public class Upload2 {
     private String videourl;
     private String phonenumber;
 
-    public Upload2(){
+    public Upload3(){
     }
 
 
-    public Upload2(String imgname, String imgurl, String videoname, String videourl, String phonenumber) {
-
+    public Upload3(String imgname, String imgurl, String videoname, String videourl, String phonenumber) {
+        if(imgname.trim().equals(""))
+        {
+            imgname = "No Name";
+        }
+        if(videoname.trim().equals(""))
+        {
+            videoname="No Name";
+        }
         this.imgname = imgname;
         this.imgurl = imgurl;
         this.videoname = videoname;

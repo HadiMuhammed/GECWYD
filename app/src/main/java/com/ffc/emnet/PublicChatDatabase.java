@@ -11,4 +11,5 @@ public interface PublicChatDatabase {
     String muser = mauth.getCurrentUser().getPhoneNumber();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference publicChatInbox = database.getReference("/PublicChat/"+muser+"/");
+    DatabaseReference publicChatComments = database.getReference("PublicComments"+muser+"/");
 }

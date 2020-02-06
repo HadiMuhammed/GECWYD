@@ -32,6 +32,7 @@ public interface Locate {
      DatabaseReference Iamintrouble = database.getReference("IAMINTROUBLE");
      DatabaseReference Events = database.getReference("Events");
      DatabaseReference notification = database.getReference("notification");
+     DatabaseReference SOS = database.getReference("SOS");
 
 
      FirebaseAuth mAuth = FirebaseAuth.getInstance();

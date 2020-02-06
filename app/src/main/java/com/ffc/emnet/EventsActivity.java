@@ -41,6 +41,7 @@ public class EventsActivity extends AppCompatActivity implements Locate {
 private static final int CHOOSE_IMAGE=1;
 private Button choosebtn;
 private Button uploadbtn;
+private Button Sosbtn;
 private ImageView eImage;
 private EditText description;
 private Uri imguri;
@@ -62,7 +63,7 @@ private ProgressBar eprogress;
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("Events");
         eprogress = findViewById(R.id.eprogress);
-
+        Sosbtn=(Button) findViewById(R.id.SosContacts);
         choosebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,6 +76,17 @@ private ProgressBar eprogress;
             @Override
             public void onClick(View view) {
                 uploadFiles();
+            }
+        });
+
+        Sosbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(EventsActivity.this,Sos.class);
+
+                startActivity(intent);
+
+
             }
         });
 
@@ -93,6 +105,9 @@ private ProgressBar eprogress;
 
         return mimeTypeMap.getExtensionFromMimeType(cr.getType(imguri));
     }
+
+
+
 
 
 
@@ -156,45 +171,38 @@ private ProgressBar eprogress;
 
     public void ShowNotification(String title,String Message) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(EventsActivity.this);
-        Intent intent = new Intent(EventsActivity.this, SendFragment.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(EventsActivity.this, 01, intent, 0);
-        builder.setContentIntent(pendingIntent);
-        builder.setDefaults(Notification.DEFAULT_ALL);
-        builder.setContentText(Message);
-        builder.setContentTitle(title);
-        builder.setSmallIcon(R.mipmap.ic_launcher);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(001, builder.build());
-    }
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(EventsActivity.this);
+            builder.setDefaults(Notification.DEFAULT_ALL);
+            builder.setContentText(Message);
+            builder.setContentTitle(title);
+            builder.setSmallIcon(R.drawable.exo_notification_small_icon);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.notify(001, builder.build());
+
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // CharSequence name = getString("channel");
-            //String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("channel", "channel", importance);
+            NotificationChannel channel = new NotificationChannel("channel_id", "channel_name", importance);
             channel.setDescription("Disaster Management");
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager1 = getSystemService(NotificationManager.class);
-            notificationManager1.createNotificationChannel(channel);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
 
-
-
-
-            Notification newMessageNotification = new Notification.Builder(EventsActivity.this, "channel")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle(title)
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(EventsActivity.this);
+            Notification notification = new NotificationCompat.Builder(EventsActivity.this,"channel_id")
+                    .setSmallIcon(R.drawable.exo_notification_small_icon)
                     .setDefaults(Notification.DEFAULT_ALL)
                     .setContentText(Message)
-                    .build();
+                    .setContentTitle(title)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .build()
+                    ;
 
-// Issue the notification.
-            NotificationManagerCompat notificationManager3 = NotificationManagerCompat.from(EventsActivity.this);
-            notificationManager3.notify(001, newMessageNotification);
+            notificationManager.notify(001,notification);
 
 
         }
     }
+
 
 
 }

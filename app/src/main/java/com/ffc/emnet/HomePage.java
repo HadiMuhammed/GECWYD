@@ -45,28 +45,28 @@ int[] Images = {R.drawable.flood,R.drawable.landslide,R.drawable.earth,R.drawabl
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             if(i==0)
             {
-                Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
+               // Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
                 Locate.Floodref.child(Locate.CurrentUserPhoneNumber).setValue("");
                 Intent intent = new Intent(HomePage.this, EventsActivity.class);
                 startActivity(intent);
             }
             else if(i==1)
             {
-                Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
+               // Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
                 Locate.LandSlideref.child(Locate.CurrentUserPhoneNumber).setValue("");
                 Intent intent = new Intent(HomePage.this, EventsActivity.class);
                 startActivity(intent);
             }
            else if(i==2)
             {
-                Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
                 Locate.EarthQuakeref.child(Locate.CurrentUserPhoneNumber).setValue("");
                 Intent intent = new Intent(HomePage.this, EventsActivity.class);
                 startActivity(intent);
             }
             else if(i==3)
             {
-                Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(HomePage.this,"An Alert is Send !",Toast.LENGTH_SHORT).show();
                 Locate.Fireref.child(Locate.CurrentUserPhoneNumber).setValue("");
                 Intent intent = new Intent(HomePage.this, EventsActivity.class);
                 startActivity(intent);
